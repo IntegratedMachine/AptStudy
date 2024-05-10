@@ -4,14 +4,19 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
+import javax.annotation.processing.Messager;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import javax.tools.Diagnostic;
 
 /**
  * Created by gavin
@@ -89,10 +94,10 @@ public class ClassCreatorProxy {
      *
      * @return
      */
-    public TypeSpec generateJavaCode2() {
+    public TypeSpec generateJavaCode2(Messager mMessager) {
         TypeSpec bindingClass = TypeSpec.classBuilder(mBindingClassName)
                 .addModifiers(Modifier.PUBLIC)
-                .addMethod(generateMethods2())
+                .addMethod(generateMethods2(mMessager))
                 .build();
         return bindingClass;
 
@@ -102,20 +107,79 @@ public class ClassCreatorProxy {
      * 加入Method
      * javapoet
      */
-    private MethodSpec generateMethods2() {
+    private MethodSpec generateMethods2(Messager mMessager) {
         ClassName host = ClassName.bestGuess(mTypeElement.getQualifiedName().toString());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("bind")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(void.class)
                 .addParameter(host, "host");
 
+        boolean isKtClass = false;
+        List<? extends TypeParameterElement> typeParameters = mTypeElement.getTypeParameters();
+        for (TypeParameterElement typeParameter : typeParameters) {
+            mMessager.printMessage(Diagnostic.Kind.NOTE, "typeParameter: " + typeParameter);
+        }
+        List<? extends Element> enclosedElements = mTypeElement.getEnclosedElements();
+        for (Element enclosedElement : enclosedElements) {
+            mMessager.printMessage(Diagnostic.Kind.NOTE, "enclosedElement: " + enclosedElement);
+            String enclosedElementString = enclosedElement.toString();
+            if (enclosedElementString.startsWith("get")) {
+                for (Element enclosedElementIn : enclosedElements) {
+                    if (enclosedElementString.substring(3).replace("()", "").equals(capitalize(enclosedElementIn.toString()))) {
+                        isKtClass = true;
+                        break;
+                    }
+                }
+                if (isKtClass) {
+                    break;
+                }
+            }
+        }
+        mMessager.printMessage(Diagnostic.Kind.NOTE, "mTypeElement: " + mTypeElement
+                + ", host: " + host.packageName()
+                + ", isKtClass: " + isKtClass
+        );
         for (int id : mVariableElementMap.keySet()) {
             VariableElement element = mVariableElementMap.get(id);
             String name = element.getSimpleName().toString();
             String type = element.asType().toString();
-            methodBuilder.addCode("host." + name + " = " + "(" + type + ")(((android.app.Activity)host).findViewById( " + id + "));");
+//            methodBuilder.addCode("host." + name + " = " + "(" + type + ")(((android.app.Activity)host).findViewById( " + id + "));");
+            if (isKtClass) {
+                methodBuilder.addStatement(
+                        "host.set$N(host.findViewById($L))",
+                        capitalize(element.getSimpleName().toString()), id
+                );
+            } else {
+                methodBuilder.addStatement(
+                        "host.$N = host.findViewById($L)",
+                        element.getSimpleName().toString(), id
+                );
+            }
         }
         return methodBuilder.build();
+    }
+
+    public String capitalize(String inputString) {
+
+        // get the first character of the inputString
+        char firstLetter = inputString.charAt(0);
+
+        // convert it to an UpperCase letter
+        char capitalFirstLetter = Character.toUpperCase(firstLetter);
+
+        // return the output string by updating
+        //the first char of the input string
+        return capitalFirstLetter + inputString.substring(1);
+    }
+
+    public boolean isKtClass(Class clazz) {
+        Annotation[] annotations = clazz.getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation.toString().contains("kotlin")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

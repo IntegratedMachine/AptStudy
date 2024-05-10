@@ -1,14 +1,15 @@
 package com.example.gavin.apttest;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gavin.apt_annotation.BindView;
 import com.example.gavin.apt_library.BindViewTools;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivityJa extends AppCompatActivity {
 
     @BindView(R.id.tv)
     TextView mTextView;
