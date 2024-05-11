@@ -3,7 +3,7 @@
 buildscript {
     
     ext {
-        kotlin_version = '1.5.21'
+        kotlin_version = '1.9.21'
     }
     repositories {
         maven { url "https://jitpack.io" }
@@ -26,7 +26,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.google.devtools.ksp' version '1.6.20-RC-1.0.4'
+    id 'com.google.devtools.ksp' version '1.9.21-1.0.15'
 }
 
 allprojects {

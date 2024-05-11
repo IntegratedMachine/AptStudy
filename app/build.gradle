@@ -47,7 +47,7 @@ dependencies {
 
     implementation project(':apt-annotation')
     implementation project(':apt-library')
-    kapt project(':apt-processor')
+//    kapt project(':apt-processor')
 //    kapt project(':apt-processor-kotlin')
-//    ksp project(':ksp-processor')
+    ksp project(':ksp-processor')
 }
