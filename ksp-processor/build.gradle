@@ -1,0 +1,20 @@
+plugins {
+    id("java-library")
+    id("org.jetbrains.kotlin.jvm")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation("com.squareup:kotlinpoet:1.10.2") {
+        exclude module: 'kotlin-reflect'
+    }
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.20-RC")
+    implementation("com.squareup:kotlinpoet-ksp:1.10.2")
+    implementation("com.google.devtools.ksp:symbol-processing:1.6.20-RC-1.0.4")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.6.20-RC-1.0.4")
+    implementation project(':apt-annotation')
+}

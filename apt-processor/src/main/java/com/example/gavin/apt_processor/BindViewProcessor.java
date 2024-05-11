@@ -51,7 +51,8 @@ public class BindViewProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        mMessager.printMessage(Diagnostic.Kind.NOTE, "processing...");
+        long startTimeMs = System.currentTimeMillis();
+        mMessager.printMessage(Diagnostic.Kind.NOTE, "process start");
         mProxyMap.clear();
         //得到所有的注解
         Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(BindView.class);
@@ -95,7 +96,8 @@ public class BindViewProcessor extends AbstractProcessor {
                 e.printStackTrace();
             }
         }
-        mMessager.printMessage(Diagnostic.Kind.NOTE, "process finish ...");
+        long totalTime = System.currentTimeMillis() - startTimeMs;
+        mMessager.printMessage(Diagnostic.Kind.NOTE, "process finish totalTime: " + totalTime);
         return true;
     }
 

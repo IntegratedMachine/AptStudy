@@ -1,25 +1,41 @@
-apply plugin: 'com.android.application'
-apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id("com.google.devtools.ksp")
+}
 
 android {
-    compileSdkVersion 31
+    compileSdk 32
+
     defaultConfig {
-        applicationId "com.example.gavin.apttest"
-        minSdkVersion 15
-        targetSdkVersion 31
+        applicationId "com.zj.ksp_butterknife"
+        minSdk 21
+        targetSdk 32
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    sourceSets.main.java {
+        srcDirs 'build/generated/ksp/debug/kotlin'
     }
 }
 
@@ -32,4 +48,6 @@ dependencies {
     implementation project(':apt-annotation')
     implementation project(':apt-library')
     kapt project(':apt-processor')
+//    kapt project(':apt-processor-kotlin')
+//    ksp project(':ksp-processor')
 }
