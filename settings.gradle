@@ -1,3 +1,4 @@
 include ':app', ':apt-annotation', ':apt-processor', ':apt-library'
 include ':ksp-processor'
 include ':apt-processor-kotlin'
+include ':asm-plugin'

@@ -4,8 +4,6 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="testRunner" value="GRADLE" />
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleJvm" value="corretto-1.8" />
         <option name="modules">
@@ -15,8 +13,12 @@
             <option value="$PROJECT_DIR$/apt-annotation" />
             <option value="$PROJECT_DIR$/apt-library" />
             <option value="$PROJECT_DIR$/apt-processor" />
+            <option value="$PROJECT_DIR$/apt-processor-kotlin" />
+            <option value="$PROJECT_DIR$/asm-plugin" />
+            <option value="$PROJECT_DIR$/ksp-processor" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

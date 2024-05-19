@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id("com.google.devtools.ksp")
+    id 'my.transform'
 }
 
 android {
@@ -49,5 +50,5 @@ dependencies {
     implementation project(':apt-library')
 //    kapt project(':apt-processor')
 //    kapt project(':apt-processor-kotlin')
-    ksp project(':ksp-processor')
+//    ksp project(':ksp-processor')
 }
