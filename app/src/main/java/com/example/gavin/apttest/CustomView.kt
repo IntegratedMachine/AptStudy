@@ -23,4 +23,9 @@ class CustomView @JvmOverloads constructor(
         textView!!.text = "bind TextView success"
         mButton!!.text = "bind Button success"
     }
+
+    public fun bindView(): Unit {
+        textView = findViewById(2131231016)
+        mButton = findViewById(2131230812)
+    }
 }

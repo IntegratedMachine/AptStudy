@@ -1,11 +1,16 @@
 package com.asm.plugin.visitor
 
+import com.asm.plugin.bean.FieldData
 import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.FieldVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.TypePath
 
-class BindFieldVisitor(fv: FieldVisitor) : FieldVisitor(Opcodes.ASM7, fv) {
+class BindFieldVisitor(
+    fv: FieldVisitor,
+    val fieldAnnoMap: ArrayList<FieldData>,
+    val fieldName: String?
+) : FieldVisitor(Opcodes.ASM7, fv) {
     private val TAG = "BindFieldVisitor"
 
     override fun visitAnnotation(descriptor: String?, visible: Boolean): AnnotationVisitor {
@@ -15,7 +20,7 @@ class BindFieldVisitor(fv: FieldVisitor) : FieldVisitor(Opcodes.ASM7, fv) {
         if (containsTag == true) {
             println("$TAG : visitAnnotation new AnnotationVisitor")
             val av = fv.visitAnnotation(descriptor, visible)
-            return BindAnnotationVisitor(av)
+            return BindAnnotationVisitor(av, fieldAnnoMap, fieldName, descriptor)
         }
         return super.visitAnnotation(descriptor, visible)
     }

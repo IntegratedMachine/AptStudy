@@ -3,6 +3,11 @@ package com.asm.plugin.transform
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.asm.plugin.visitor.BindClassVisitor
+import jdk.internal.org.objectweb.asm.Opcodes.ACC_PUBLIC
+import jdk.internal.org.objectweb.asm.Opcodes.ACC_STATIC
+import jdk.internal.org.objectweb.asm.Opcodes.GETSTATIC
+import jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL
+import jdk.internal.org.objectweb.asm.Opcodes.RETURN
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
@@ -10,12 +15,14 @@ import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassReader.EXPAND_FRAMES
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.MethodVisitor
 import java.io.File
 import java.io.FileOutputStream
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
+
 
 class MethodTimerTransform(var project: Project) : Transform() {
 
@@ -89,13 +96,54 @@ class MethodTimerTransform(var project: Project) : Transform() {
                         val classWriter = ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
                         val cv = BindClassVisitor(classWriter)
                         classReader.accept(cv, EXPAND_FRAMES)
+                        //新增加一个方法
+                        val mw: MethodVisitor = classWriter.visitMethod(
+                            ACC_PUBLIC + ACC_STATIC,
+                            "add",
+                            "([Ljava/lang/String;)V",
+                            null,
+                            null
+                        )
+                        // pushes the 'out' field (of type PrintStream) of the System class
+                        mw.visitFieldInsn(
+                            GETSTATIC,
+                            "java/lang/System",
+                            "out",
+                            "Ljava/io/PrintStream;"
+                        )
+                        // pushes the "Hello World!" String constant
+                        mw.visitLdcInsn("this is add method print!")
+                        // invokes the 'println' method (defined in the PrintStream class)
+                        mw.visitMethodInsn(
+                            INVOKEVIRTUAL,
+                            "java/io/PrintStream",
+                            "println",
+                            "(Ljava/lang/String;)V"
+                        )
+                        mw.visitInsn(RETURN)
+                        // this code uses a maximum of two stack elements and two local
+                        // variables
+                        mw.visitMaxs(0, 0)
+                        mw.visitEnd()
+
                         val code = classWriter.toByteArray()
                         val fos = FileOutputStream(
                             file.parentFile.absolutePath + File.separator + name
                         )
-                        println("handleDirectoryInput fos: $fos")
+                        println("handleDirectoryInput fos: ${file.parentFile.absolutePath}")
                         fos.write(code)
                         fos.close()
+
+                        val file1 = File("build/temp")
+                        if (!file1.exists()) {
+                            file1.mkdirs()
+                        }
+                        val fos1 = FileOutputStream(
+                            "build/temp/$name"
+                        )
+
+                        fos1.write(code)
+                        fos1.close()
                     }
                 }
 
